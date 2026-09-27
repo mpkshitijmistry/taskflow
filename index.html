@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TaskFlow — Task Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="logo-mark">&#10003;</span>
+      <span class="logo-text">TaskFlow</span>
+    </div>
+
+    <nav class="nav-section">
+      <h2 class="nav-label">Projects</h2>
+      <ul class="project-list" id="projectList"><!-- rendered by script.js --></ul>
+      <button class="text-btn" id="addProjectBtn" type="button">+ Add project</button>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- ===================== MAIN ===================== -->
+  <div class="main">
+
+    <header class="topbar">
+      <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Toggle projects panel">&#9776;</button>
+
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M14 14L18 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search tasks…" aria-label="Search tasks" autocomplete="off" />
+      </div>
+
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme">&#9789;</button>
+      <button class="primary-btn" id="newTaskBtn" type="button">+ New task</button>
+    </header>
+
+    <section class="dashboard" id="dashboard" aria-label="Task summary"><!-- rendered by script.js --></section>
+
+    <section class="view-controls">
+      <div class="tabs" id="viewTabs" role="tablist">
+        <button class="tab active" data-view="all" type="button">All tasks</button>
+        <button class="tab" data-view="today" type="button">Today</button>
+        <button class="tab" data-view="upcoming" type="button">Upcoming</button>
+        <button class="tab" data-view="completed" type="button">Completed</button>
+        <button class="tab" data-view="overdue" type="button">Overdue</button>
+      </div>
+
+      <div class="controls-right">
+        <select id="priorityFilter" class="select" aria-label="Filter by priority">
+          <option value="all">All priorities</option>
+          <option value="high">High priority</option>
+          <option value="medium">Medium priority</option>
+          <option value="low">Low priority</option>
+        </select>
+
+        <select id="statusFilter" class="select" aria-label="Filter by status">
+          <option value="all">All statuses</option>
+          <option value="todo">To do</option>
+          <option value="in-progress">In progress</option>
+          <option value="completed">Completed</option>
+        </select>
+
+        <select id="sortSelect" class="select" aria-label="Sort tasks">
+          <option value="due">Sort: Due date</option>
+          <option value="priority">Sort: Priority</option>
+          <option value="created">Sort: Created date</option>
+          <option value="az">Sort: A to Z</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="quick-add">
+      <span class="quick-add-icon">+</span>
+      <input type="text" id="quickAddInput" placeholder="Add a task and press Enter…  (press n to focus)" autocomplete="off" />
+    </section>
+
+    <section class="task-list" id="taskList" aria-label="Tasks"><!-- rendered by script.js --></section>
+
+  </div>
+</div>
+
+<!-- ===================== TASK MODAL (add / edit) ===================== -->
+<div class="modal-backdrop" id="taskModalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
+    <form id="taskForm">
+      <div class="modal-header">
+        <h2 id="taskModalTitle">New task</h2>
+        <button class="icon-btn" id="closeTaskModal" type="button" aria-label="Close">&#10005;</button>
+      </div>
+
+      <div class="modal-body">
+        <label class="field">
+          <span>Title <em>required</em></span>
+          <input type="text" id="taskTitle" required maxlength="120" placeholder="What needs to get done?" />
+        </label>
+
+        <label class="field">
+          <span>Description</span>
+          <textarea id="taskDescription" rows="3" placeholder="Optional details…"></textarea>
+        </label>
+
+        <div class="field-row">
+          <label class="field">
+            <span>Project</span>
+            <select id="taskProject">
+              <option value="">No project</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Due date</span>
+            <input type="date" id="taskDueDate" />
+          </label>
+        </div>
+
+        <div class="field-row">
+          <label class="field">
+            <span>Priority</span>
+            <select id="taskPriority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Status</span>
+            <select id="taskStatus">
+              <option value="todo">To do</option>
+              <option value="in-progress">In progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="ghost-btn" id="deleteTaskBtn">Delete task</button>
+        <div class="footer-right">
+          <button type="button" class="ghost-btn" id="cancelTaskBtn">Cancel</button>
+          <button type="submit" class="primary-btn" id="saveTaskBtn">Save task</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== CONFIRM MODAL (delete) ===================== -->
+<div class="modal-backdrop" id="confirmBackdrop">
+  <div class="modal modal-small" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-header">
+      <h2 id="confirmTitle">Delete this?</h2>
+      <button class="icon-btn" id="closeConfirmModal" type="button" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMessage">This can't be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <div class="footer-right">
+        <button type="button" class="ghost-btn" id="cancelConfirmBtn">Cancel</button>
+        <button type="button" class="danger-btn" id="confirmActionBtn">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PROJECT MODAL (add / rename) ===================== -->
+<div class="modal-backdrop" id="projectModalBackdrop">
+  <div class="modal modal-small" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
+    <form id="projectForm">
+      <div class="modal-header">
+        <h2 id="projectModalTitle">New project</h2>
+        <button class="icon-btn" id="closeProjectModal" type="button" aria-label="Close">&#10005;</button>
+      </div>
+      <div class="modal-body">
+        <label class="field">
+          <span>Project name <em>required</em></span>
+          <input type="text" id="projectName" required maxlength="40" placeholder="e.g. Marketing site" />
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="ghost-btn" id="deleteProjectBtn">Delete project</button>
+        <div class="footer-right">
+          <button type="button" class="ghost-btn" id="cancelProjectBtn">Cancel</button>
+          <button type="submit" class="primary-btn">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
